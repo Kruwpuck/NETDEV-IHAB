@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Seat</title>
+    {% load static %}
+    <link href="{% static 'bioskop/css/style.css' %}" rel="stylesheet">
+    <style>
+        .screen {
+            width: 100%;
+            background-color: #ccc;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .seats {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);  /* Adjust this based on number of seats per row */
+            gap: 10px;
+        }
+        .seat {
+            width: 30px;
+            height: 30px;
+            background-color: #444;
+            border-radius: 5px;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+            cursor: pointer;
+            position: relative;
+        }
+        .seat input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 100%;
+            width: 100%;
+        }
+        .seat.booked {
+            background-color: #ff4c4c;
+            cursor: not-allowed;
+        }
+        .seat.selected {
+            background-color: #6feaf6;
+        }
+    </style>
+</head>
+<body>
+    <h1>Choose Your Seat</h1>
+    <h2>{{ movie.title }}</h2>
+    <h3>{{ movie.showtime }}</h3>
+
+    <!-- Representasi layar -->
+    <div class="screen">SCREEN</div>
+
+    <form action="{% url 'payment' %}" method="post">
+        {% csrf_token %}
+        <div class="seats">
+            {% for seat in seats %}
+                <label class="seat {% if seat.booked %}booked{% elif seat.id|stringformat:"s"|default_if_none:"0" in request.session.selected_seats %}selected{% else %}available{% endif %}">
+                    <input type="checkbox" name="seat" value="{{ seat.id }}" {% if seat.booked %}disabled{% endif %}>
+                    {{ seat.seat_number }}
+                </label>
+            {% endfor %}
+        </div>
+        {% if error_message %}
+            <div class="error">{{ error_message }}</div>
+        {% endif %}
+        <button type="submit">Proceed to Payment</button>
+    </form>
+</body>
+</html>
