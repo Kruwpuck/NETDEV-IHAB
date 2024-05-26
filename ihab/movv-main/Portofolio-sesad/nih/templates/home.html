@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}MOVIE-VERSE{% endblock title %}
+{% block body %}
+<div class="container">
+    <div class="content">
+        <img src="../static/assets/img/logo.png" alt="" class="movie-image">
+        <div class="text-sci">
+            <h2>Welcome!
+                <br><span>To Movie-Verse</span>
+            </h2>
+            <p>Explore the Cinema World and Enjoy Movies Anywhere
+            </p>
+        </div>
+    </div>
+    <div class="logreg-box">
+    {% block login%}
+    {% endblock login%}
+    </div>
+</div>
+{% endblock body %}
+

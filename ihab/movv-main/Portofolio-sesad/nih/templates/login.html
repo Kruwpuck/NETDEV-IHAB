@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Login{% endblock title %}
+{% block body %}
+<div class="container">
+    <div class="content">
+        <img src="../static/assets/img/logo.png" alt="" class="movie-image">
+        <div class="text-sci">
+            <h2>Welcome!
+                <br><span>To Movie-Verse</span>
+            </h2>
+            <p>Explore the Cinema World and Enjoy Movies Anywhere
+            </p>
+        </div>
+    </div>
+    <div class="logreg-box">
+        <div class="form-box login">
+            <form action="/auth/login/">
+                <h2>Login</h2>
+        
+                <div class="input-box">
+                    <span class="icon"><i class='bx bxs-envelope' ></i></span>
+                    <input type="email" required>
+                    <label>Email</label>
+                </div>
+        
+                <div class="input-box">
+                    <span class="icon"><i class='bx bxs-lock-alt'></i></span>
+                    <input type="password" required>
+                    <label>Password</label>
+                </div>
+        
+                <div class="remember">
+                    <label><input type="checkbox">Remember me</label>
+                    <a href="/auth/forgot-password/">Forgot password</a>
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <div class="login-register">
+                    <p>Don't have an account? <a href="/auth/signup/" class="register-link">Sign Up</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock body %}
+
+
+
+
