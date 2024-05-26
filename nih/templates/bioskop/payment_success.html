@@ -1,14 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pembayaran Berhasil</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'bioskop/css/style.css' %}">
-</head>
-<body>
-    <h1>Pembayaran Berhasil</h1>
-    <p>Terima kasih telah melakukan pembayaran. Transaksi Anda telah berhasil.</p>
-</body>
+    <link rel="stylesheet" href="{% static 'bioskop/css/style.css' %}" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f3f3f3;
+        margin: 0;
+        padding: 0;
+      }
+      .receipt {
+        width: 80%;
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .receipt h1 {
+        text-align: center;
+        color: #333;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+      }
+      .receipt .details {
+        margin-top: 20px;
+      }
+      .receipt .details p {
+        margin: 5px 0;
+        font-size: 16px;
+      }
+      .receipt .total {
+        text-align: right;
+        margin-top: 20px;
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .receipt .thank-you {
+        text-align: center;
+        margin-top: 30px;
+        font-size: 18px;
+        color: #28a745;
+      }
+      .button {
+        display: inline-block;
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+      }
+      .button:hover {
+        background-color: #0056b3;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="receipt">
+      <h1>Pembayaran Berhasil</h1>
+      <div class="details">
+        <table>
+          <tr>
+            <th>Item</th>
+            <th>Detail</th>
+          </tr>
+          <tr>
+            <td>Judul Film:</td>
+            <td>{{ movie.title }}</td>
+          </tr>
+          <tr>
+            <td>Waktu Tayang:</td>
+            <td>{{ movie.showtime }}</td>
+          </tr>
+          <tr>
+            <td>Kursi yang Dipilih:</td>
+            <td>{{ selected_seats|join:", " }}</td>
+          </tr>
+          <tr>
+            <td>Total Harga:</td>
+            <td>Rp {{ total_price }}</td>
+          </tr>
+        </table>
+      </div>
+      <div class="thank-you">
+        <p>Terima kasih telah melakukan pembayaran. Transaksi Anda telah berhasil.</p>
+      </div>
+      <div style="text-align: center; margin-top: 20px">
+        <a href="/" class="button">Kembali ke Beranda</a>
+      </div>
+    </div>
+  </body>
 </html>

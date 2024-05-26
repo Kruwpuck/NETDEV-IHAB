@@ -1,5 +1,6 @@
 from django.db import models
-from django.utils import timezone  # Import timezone for default value
+from django.utils import timezone 
+from datetime import timedelta # Import timezone for default value
 
 class Movie(models.Model):
     title = models.CharField(max_length=100)
@@ -7,6 +8,8 @@ class Movie(models.Model):
     showtime = models.DateTimeField(default=timezone.now)
     poster = models.ImageField(upload_to="img/%y")
     #poster = models.CharField(max_length=100)  # Path relatif ke file static
+    release_year = models.IntegerField(default=timezone.now().year)
+    duration= models.DurationField(default=timedelta(hours=0))
     
 
     def __str__(self):

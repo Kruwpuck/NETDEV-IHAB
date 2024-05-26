@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, render
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
@@ -8,54 +8,49 @@ from django.utils.http import urlsafe_base64_encode
 
 # Create your views here.
 def signup(request):
-    
-    if request.method=="POST":
-        get_email=request.POST.get('email')
-        get_password=request.POST.get('pass1')
-        get_confirm_password=request.POST.get('pass2')
-        if get_password!=get_confirm_password:
-            messages.info(request,'Password is not matching')
+    if request.method == "POST":
+        get_email = request.POST.get('email')
+        get_password = request.POST.get('pass1')
+        get_confirm_password = request.POST.get('pass2')
+        if get_password != get_confirm_password:
+            messages.info(request, 'Password is not matching')
             return redirect('/auth/signup/')
         
         try:
             if User.objects.get(username=get_email):
-                messages.warning(request,"Email is Taken")
+                messages.warning(request, "Email is Taken")
                 return redirect('/auth/signup/')
-        except Exception as identifier:
+        except User.DoesNotExist:
             pass
-        myuser=User.objects.create_user(get_email,get_email,get_password)
+        
+        myuser = User.objects.create_user(get_email, get_email, get_password)
         myuser.save()
 
-        myuser= authenticate(username=get_email,password=get_password)
-
+        myuser = authenticate(username=get_email, password=get_password)
         if myuser is not None:
-
-            login(request,myuser)
-            messages.success(request,"User Created & Login Success")
+            login(request, myuser)
+            messages.success(request, "User Created & Login Success")
             return redirect('/')
-
         
-    return render(request,'signup.html')
+    return render(request, 'signup.html')
 
 def handleLogin(request):
-    if request.method=="POST":
-        get_email=request.POST.get('email')
-        get_password=request.POST.get('pass1')
-        myuser= authenticate(username=get_email,password=get_password)
-
+    if request.method == "POST":
+        get_email = request.POST.get('email')
+        get_password = request.POST.get('pass1')
+        myuser = authenticate(username=get_email, password=get_password)
         if myuser is not None:
-            login(request,myuser)
-            messages.success(request,"Login Success")
+            login(request, myuser)
+            messages.success(request, "Login Success")
             return redirect('/')
         else:
-            messages.error(request,"Invalid Credentials")
-    return render(request,'login.html')
+            messages.error(request, "Invalid Credentials")
+    return render(request, 'login.html')
 
 def handleLogout(request):
     logout(request)
-    messages.success(request,'logout success')
-    return render(request,'login.html')
-
+    messages.success(request, 'Logout success')
+    return render(request, 'login.html')
 
 def forgot_password(request):
     if request.method == "POST":
@@ -69,10 +64,10 @@ def forgot_password(request):
             # Construct reset password URL
             reset_url = f"/password/reset/{uid}/{token}/"
             # Redirect to reset password page
-            messages.success(request, f"Link reset password telah dikirim ke {email}.")
+            messages.success(request, f"Password reset link has been sent to {email}.")
             return redirect(reset_url)
         except User.DoesNotExist:
-            messages.error(request, "Email tidak terdaftar.")
+            messages.error(request, "Email not registered.")
             return redirect('/')
     
     return render(request, 'password.html')

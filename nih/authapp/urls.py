@@ -8,3 +8,4 @@ urlpatterns = [
     path('password/',views.forgot_password,name='forgot_password'),
    
 ]
+
