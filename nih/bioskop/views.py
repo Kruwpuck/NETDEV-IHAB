@@ -69,11 +69,11 @@ def payment_success(request):
         movie_showtime = "Unknown"
 
     return render(request, 'bioskop/payment_success.html', {
-        'selected_seats': selected_seats,
-        'total_price': total_price,
-        'movie_title': movie_title,
-        'movie_showtime': movie_showtime
-    })
+    'selected_seats': selected_seats,
+    'total_price': total_price,
+    'movie': movie
+})
+
 
 
 def about(request):
