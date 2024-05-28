@@ -75,6 +75,5 @@ def payment_success(request):
 })
 
 
-
 def about(request):
     return render(request, 'aboutUs.html')

@@ -19,27 +19,20 @@
         <a href="#">MOVIE-VERSE</a>
         <a href="/">Home</a>
         <a href="/buy-ticket">Buy Ticket</a>
-        <a href="/coming-soon">Coming Soon</a>
+
         <a href="/about">About</a>
-        <a href="/contact">Contact Us</a>
-        <div class="dropdown">
-          <a href="#" class="dropbtn">Location</a>
-          <div class="dropdown-content">
-            <a href="/action">Bandung</a>
-            <a href="/drama">Jakarta</a>
-            <a href="/comedy">Surabaya</a>
-          </div>
-        </div>
+
         <div class="dropdown">
           <a href="#" class="dropbtn">New User</a>
           <div class="dropdown-content">
+            {% if not request.user.is_authenticated %}
+            <a href="/auth/signup/" class="dropdown-item">Sign Up</a>
+            <a href="/auth/login/" class="dropdown-item">Login</a>
+            {% else %}
             <a href="/auth/logout/" class="dropdown-item">Log Out</a>
+            {% endif %}
           </div>
         </div>
-        <form action="#" class="search-bar">
-          <input type="text" placeholder="Search" />
-          <button type="submit"><i class="bx bx-search"></i></button>
-        </form>
       </nav>
     </header>
 
