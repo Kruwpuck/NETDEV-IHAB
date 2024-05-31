@@ -113,8 +113,7 @@
         <!-- Representasi layar -->
         <div class="screen">SCREEN</div>
 
-        <form id="seat-form" action="{% url 'payment' movie.id %}" method="post">
-
+        <form id="seat-form" action="{% url 'payment' %}" method="post">
             {% csrf_token %}
             <div class="seats">
                 {% for seat in seats %}
@@ -131,7 +130,6 @@
                 <div class="error">{{ error_message }}</div>
             {% endif %}
             <a href="{% url 'payment' movie.id %}">Bayar</a>
-
             <button type="submit">Proceed to Payment</button>
         </form>
     </div>

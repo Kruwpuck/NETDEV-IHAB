@@ -6,64 +6,70 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
-# Create your views here.
 def signup(request):
     if request.method == "POST":
         get_email = request.POST.get('email')
         get_password = request.POST.get('pass1')
         get_confirm_password = request.POST.get('pass2')
+        
         if get_password != get_confirm_password:
-            messages.info(request, 'Password is not matching')
+            messages.error(request, 'Passwords do not match.')
             return redirect('/auth/signup/')
         
-        try:
-            if User.objects.get(username=get_email):
-                messages.warning(request, "Email is Taken")
-                return redirect('/auth/signup/')
-        except User.DoesNotExist:
-            pass
+        if User.objects.filter(username=get_email).exists():
+            messages.warning(request, "Email is already taken.")
+            return redirect('/auth/signup/')
         
-        myuser = User.objects.create_user(get_email, get_email, get_password)
+        myuser = User.objects.create_user(username=get_email, email=get_email, password=get_password)
         myuser.save()
 
         myuser = authenticate(username=get_email, password=get_password)
         if myuser is not None:
             login(request, myuser)
-            messages.success(request, "User Created & Login Success")
+            messages.success(request, "User created and logged in successfully.")
             return redirect('/')
-        
+        else:
+            messages.error(request, "User authentication failed. Please try again.")
+            return redirect('/auth/login/')
+    
     return render(request, 'signup.html')
 
 def handleLogin(request):
     if request.method == "POST":
-        get_email = request.POST.get('email')
-        get_password = request.POST.get('pass1')
-        myuser = authenticate(username=get_email, password=get_password)
-        if myuser is not None:
-            login(request, myuser)
-            messages.success(request, "Login Success")
-            return redirect('/')
+        email = request.POST.get('email')
+        password = request.POST.get('pass1')
+        
+        # Authenticate the user
+        user = authenticate(username=email, password=password)
+        
+        if user is not None:
+            # Check if the user is active and not staff (non-admin)
+            if user.is_active and not user.is_staff:
+                # Login the user
+                login(request, user)
+                messages.success(request, "Login successful.")
+                return redirect('/')
+            else:
+                messages.error(request, "Invalid credentials.")
+                return redirect('/auth/login/')
         else:
-            messages.error(request, "Invalid Credentials")
+            messages.error(request, "Invalid credentials.")
+            return redirect('/auth/login/')
     return render(request, 'login.html')
 
 def handleLogout(request):
     logout(request)
-    messages.success(request, 'Logout success')
-    return render(request, 'login.html')
+    messages.success(request, 'Logout successful.')
+    return redirect('/auth/login/')
 
 def forgot_password(request):
     if request.method == "POST":
         email = request.POST.get('email')
         try:
             user = User.objects.get(email=email)
-            # Generate token
             token = default_token_generator.make_token(user)
-            # Encode user ID
             uid = urlsafe_base64_encode(force_bytes(user.pk))
-            # Construct reset password URL
             reset_url = f"/password/reset/{uid}/{token}/"
-            # Redirect to reset password page
             messages.success(request, f"Password reset link has been sent to {email}.")
             return redirect(reset_url)
         except User.DoesNotExist:

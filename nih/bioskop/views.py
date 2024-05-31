@@ -17,7 +17,7 @@ def choose_seat(request, movie_id):
         selected_seats = request.POST.getlist('seat')
         if selected_seats:
             request.session['selected_seats'] = selected_seats
-            request.session['movie_id'] = movie_id
+            request.session['movie_id'] = movie_id  # Store the movie_id in the session
             return redirect('payment')
         else:
             return render(request, 'bioskop/choose_seat.html', {
@@ -31,36 +31,16 @@ def choose_seat(request, movie_id):
         'seats': seats
     })
 
-def payment(request):
+
+def payment(request, movie_id):
+    # Your payment logic here
+    # You can use the movie_id parameter to fetch movie-specific data if needed
+    return render(request, 'bioskop/payment.html', {'movie_id': movie_id})
+
+def payment_success(request, movie_id):
     selected_seats = request.session.get('selected_seats', [])
-    movie_id = request.session.get('movie_id')
-    movie = get_object_or_404(Movie, id=movie_id) if movie_id else None
-    seat_price = 50000  # Harga per kursi
-    total_price = len(selected_seats) * seat_price
-
-    if request.method == 'POST':
-        form = PaymentForm(request.POST)
-        if form.is_valid():
-            # Lakukan logika penyimpanan data pembayaran di sini jika diperlukan
-            request.session['total_price'] = total_price
-            return redirect('payment_success')
-    else:
-        form = PaymentForm()
-
-    return render(request, 'bioskop/payment.html', {
-        'form': form,
-        'selected_seats': selected_seats,
-        'total_price': total_price,
-        'movie': movie
-    })
-
-def payment_success(request):
-    selected_seats = request.session.get('selected_seats', [])
-    total_price = request.session.get('total_price')
-    movie_id = request.session.get('movie_id')
     movie = get_object_or_404(Movie, id=movie_id) if movie_id else None
 
-    # Memastikan data film diakses dari database dan ditampilkan di invoice
     if movie:
         movie_title = movie.title
         movie_showtime = movie.showtime
@@ -68,11 +48,17 @@ def payment_success(request):
         movie_title = "Unknown"
         movie_showtime = "Unknown"
 
+    # Calculate total price based on the number of selected seats
+    total_price = len(selected_seats) * 50000
+
     return render(request, 'bioskop/payment_success.html', {
-    'selected_seats': selected_seats,
-    'total_price': total_price,
-    'movie': movie
-})
+        'selected_seats': selected_seats,
+        'total_price': total_price,
+        'movie_title': movie_title,
+        'movie_showtime': movie_showtime,
+        'movie_id': movie_id,
+    })
+
 
 
 def about(request):

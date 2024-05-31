@@ -6,13 +6,14 @@ class Movie(models.Model):
     title = models.CharField(max_length=100)
     genre = models.CharField(max_length=100, default="Unknown")
     showtime = models.DateTimeField(default=timezone.now)
-    poster = models.ImageField(upload_to="img/%y")
     #poster = models.CharField(max_length=100)  # Path relatif ke file static
     release_year = models.IntegerField(default=timezone.now().year)
     duration= models.DurationField(default=timedelta(hours=0))
+    poster_url = models.URLField(max_length=200, default='https://example.com/default-poster.jpg')  # Default URL for the poster image
+
     
 
-    def __str__(self):
+    def _str_(self):
         return self.title
 
 class Seat(models.Model):
@@ -24,5 +25,5 @@ class Image(models.Model):
     caption=models.CharField(max_length=50)
     image=models.ImageField(upload_to="img/%y")
     
-    def __str__(self):
+    def _str_(self):
         return self.caption
