@@ -4,12 +4,40 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
-from django.http import HttpResponseRedirect
+from django.utils.http import urlsafe_base64_encode
+
+def signup(request):
+    if request.method == "POST":
+        get_email = request.POST.get('email')
+        get_password = request.POST.get('pass1')
+        get_confirm_password = request.POST.get('pass2')
+        
+        if get_password != get_confirm_password:
+            messages.error(request, 'Passwords do not match.')
+            return redirect('/auth/signup/')
+        
+        if User.objects.filter(username=get_email).exists():
+            messages.warning(request, "Email is already taken.")
+            return redirect('/auth/signup/')
+        
+        myuser = User.objects.create_user(username=get_email, email=get_email, password=get_password)
+        myuser.save()
+
+        myuser = authenticate(username=get_email, password=get_password)
+        if myuser is not None:
+            login(request, myuser)
+            messages.success(request, "User created and logged in successfully.")
+            return redirect('/')
+        else:
+            messages.error(request, "User authentication failed. Please try again.")
+            return redirect('/auth/login/')
+    
+    return render(request, 'signup.html')
 
 def handleLogin(request):
     if request.method == "POST":
         email = request.POST.get('email')
-        password = request.POST.get('password')  # fix the password variable name
+        password = request.POST.get('password')  # Mengambil nilai dari bidang 'password'
         
         # Authenticate the user
         user = authenticate(username=email, password=password)
@@ -23,17 +51,11 @@ def handleLogin(request):
                 return redirect('/')
             else:
                 messages.error(request, "Invalid credentials.")
+                return redirect('/auth/login/')
         else:
             messages.error(request, "Invalid credentials.")
-    return HttpResponseRedirect('/auth/login/')  # always redirect to login page
-
-        
-def signup(request):
-    if request.method == "POST":
-        username = request.POST.get('username')  # Ubah sesuai dengan atribut 'name'
-        email = request.POST.get('email')  # Ubah sesuai dengan atribut 'name'
-        password = request.POST.get('password')  # Ubah sesuai dengan atribut 'name'
-        # ...
+            return redirect('/auth/login/')
+    return render(request, 'login.html')
 
 
 def handleLogout(request):
