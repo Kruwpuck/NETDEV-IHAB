@@ -113,16 +113,15 @@
         <!-- Representasi layar -->
         <div class="screen">SCREEN</div>
 
-        <form id="seat-form" action="{% url 'payment' movie.id %}" method="post">
-
+        <form id="seat-form" action="{% url 'choose_seat' movie.id %}" method="post">
             {% csrf_token %}
             <div class="seats">
                 {% for seat in seats %}
-                    <label class="seat {% if seat.booked %}booked{% elif seat.id|stringformat:"s"|default_if_none:"0" in request.session.selected_seats %}selected{% else %}available{% endif %}">
-                        <input type="checkbox" name="seats" value="{{ seat.id }}" {% if seat.booked %}disabled{% endif %}>
-                        <i class="fas fa-chair"></i>
-                    </label>
-                {% endfor %}
+                <label class="seat {% if seat.booked %}booked{% elif seat.id|stringformat:"s"|default_if_none:"0" in request.session.selected_seats %}selected{% else %}available{% endif %}">
+                    <input type="checkbox" name="seat" value="{{ seat.id }}" {% if seat.booked %}disabled{% endif %}>
+                    <i class="fas fa-chair"></i>
+                </label>
+            {% endfor %}
             </div>
             <div class="total-price">
                 Total Price: Rp <span id="total-price">0</span>
@@ -130,8 +129,6 @@
             {% if error_message %}
                 <div class="error">{{ error_message }}</div>
             {% endif %}
-            <a href="{% url 'payment' movie.id %}">Bayar</a>
-
             <button type="submit">Proceed to Payment</button>
         </form>
     </div>

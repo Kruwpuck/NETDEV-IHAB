@@ -3,7 +3,7 @@ from .models import Movie, Seat
 from .forms import PaymentForm
 
 def home(request):
-    return render(request, 'home.html')
+    return render(request, 'base.html')
 
 def movie_list(request):
     movies = Movie.objects.all()
@@ -17,8 +17,7 @@ def choose_seat(request, movie_id):
         selected_seats = request.POST.getlist('seat')
         if selected_seats:
             request.session['selected_seats'] = selected_seats
-            request.session['movie_id'] = movie_id  # Store the movie_id in the session
-            return redirect('payment')
+            return redirect('payment', movie_id=movie_id)
         else:
             return render(request, 'bioskop/choose_seat.html', {
                 'movie': movie,
@@ -31,25 +30,26 @@ def choose_seat(request, movie_id):
         'seats': seats
     })
 
-
 def payment(request, movie_id):
-    # Your payment logic here
-    # You can use the movie_id parameter to fetch movie-specific data if needed
-    return render(request, 'bioskop/payment.html', {'movie_id': movie_id})
+    movie = get_object_or_404(Movie, id=movie_id)
+    if request.method == 'POST':
+        form = PaymentForm(request.POST)
+        if form.is_valid():
+            return redirect('payment_success', movie_id=movie_id)
+    else:
+        form = PaymentForm()
+
+    return render(request, 'bioskop/payment.html', {'form': form, 'movie_id': movie_id})
 
 def payment_success(request, movie_id):
     selected_seats = request.session.get('selected_seats', [])
-    movie = get_object_or_404(Movie, id=movie_id) if movie_id else None
-
-    if movie:
-        movie_title = movie.title
-        movie_showtime = movie.showtime
-    else:
-        movie_title = "Unknown"
-        movie_showtime = "Unknown"
-
-    # Calculate total price based on the number of selected seats
+    movie = get_object_or_404(Movie, id=movie_id)
+    movie_title = movie.title
+    movie_showtime = movie.showtime
     total_price = len(selected_seats) * 50000
+
+    # Mark the selected seats as booked
+    Seat.objects.filter(id__in=selected_seats).update(booked=True)
 
     return render(request, 'bioskop/payment_success.html', {
         'selected_seats': selected_seats,
@@ -58,8 +58,6 @@ def payment_success(request, movie_id):
         'movie_showtime': movie_showtime,
         'movie_id': movie_id,
     })
-
-
 
 def about(request):
     return render(request, 'aboutUs.html')
