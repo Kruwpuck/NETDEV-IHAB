@@ -113,6 +113,7 @@
         <!-- Representasi layar -->
         <div class="screen">SCREEN</div>
 
+        {% if user.is_authenticated %}
         <form id="seat-form" action="{% url 'choose_seat' movie.id %}" method="post">
             {% csrf_token %}
             <div class="seats">
@@ -121,7 +122,7 @@
                     <input type="checkbox" name="seat" value="{{ seat.id }}" {% if seat.booked %}disabled{% endif %}>
                     <i class="fas fa-chair"></i>
                 </label>
-            {% endfor %}
+                {% endfor %}
             </div>
             <div class="total-price">
                 Total Price: Rp <span id="total-price">0</span>
@@ -131,12 +132,15 @@
             {% endif %}
             <button type="submit">Proceed to Payment</button>
         </form>
+        {% else %}
+        <p>Please <a href="{% url 'login' %}">login</a> to select seats.</p>
+        {% endif %}
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const seatForm = document.getElementById('seat-form');
-            const checkboxes = seatForm.querySelectorAll('input[type="checkbox"]');
+            const checkboxes = seatForm ? seatForm.querySelectorAll('input[type="checkbox"]') : [];
             const totalPriceElement = document.getElementById('total-price');
             const seatPrice = 50000;  // Harga per kursi
 

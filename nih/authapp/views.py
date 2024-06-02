@@ -1,80 +1,62 @@
-from django.shortcuts import redirect, render
-from django.contrib.auth.models import User
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from django.contrib import messages
-from django.contrib.auth.tokens import default_token_generator
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from .models import Movie, Seat
+from .forms import SignupForm, LoginForm
 
-def signup(request):
-    if request.method == "POST":
-        get_email = request.POST.get('email')
-        get_password = request.POST.get('pass1')
-        get_confirm_password = request.POST.get('pass2')
-        
-        if get_password != get_confirm_password:
-            messages.error(request, 'Passwords do not match.')
-            return redirect('/auth/signup/')
-        
-        if User.objects.filter(username=get_email).exists():
-            messages.warning(request, "Email is already taken.")
-            return redirect('/auth/signup/')
-        
-        myuser = User.objects.create_user(username=get_email, email=get_email, password=get_password)
-        myuser.save()
+# Home page
+def index(request):
+    return render(request, 'index.html')
 
-        myuser = authenticate(username=get_email, password=get_password)
-        if myuser is not None:
-            login(request, myuser)
-            messages.success(request, "User created and logged in successfully.")
-            return redirect('/')
-        else:
-            messages.error(request, "User authentication failed. Please try again.")
-            return redirect('/auth/login/')
-    
-    return render(request, 'signup.html')
+# Signup page
+def user_signup(request):
+    if request.method == 'POST':
+        form = SignupForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')
+    else:
+        form = SignupForm()
+    return render(request, 'signup.html', {'form': form})
 
-def handleLogin(request):
-    if request.method == "POST":
-        email = request.POST.get('email')
-        password = request.POST.get('password')  # Mengambil nilai dari bidang 'password'
-        
-        # Authenticate the user
-        user = authenticate(username=email, password=password)
-        
-        if user is not None:
-            # Check if the user is active and not staff (non-admin)
-            if user.is_active and not user.is_staff:
-                # Login the user
+# Login page
+def user_login(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+            if user:
+                if username == 'dandy@gmail.com' and password == 'team1234':
+                    login(request, user)
+                    return redirect('/admin/')  # Redirect to Django admin
                 login(request, user)
-                messages.success(request, "Login successful.")
-                return redirect('/')
-            else:
-                messages.error(request, "Invalid credentials.")
-                return redirect('/auth/login/')
-        else:
-            messages.error(request, "Invalid credentials.")
-            return redirect('/auth/login/')
-    return render(request, 'login.html')
+                return redirect('home')
+    else:
+        form = LoginForm()
+    return render(request, 'login.html', {'form': form})
 
-
-def handleLogout(request):
+# Logout page
+def user_logout(request):
     logout(request)
-    messages.success(request, 'Logout successful.')
-    return redirect('/auth/login/')
+    return redirect('login')
 
-def forgot_password(request):
-    if request.method == "POST":
-        email = request.POST.get('email')
-        try:
-            user = User.objects.get(email=email)
-            token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            reset_url = f"/password/reset/{uid}/{token}/"
-            messages.success(request, f"Password reset link has been sent to {email}.")
-            return redirect(reset_url)
-        except User.DoesNotExist:
-            messages.error(request, "Email not registered.")
-            return redirect('/')
+# Seat selection page
+@login_required(login_url='login')
+def choose_seat(request, movie_id):
+    # Fetch movie and seat details
+    movie = get_object_or_404(Movie, id=movie_id)
+    seats = Seat.objects.filter(movie=movie)
     
-    return render(request, 'password.html')
+    if request.method == 'POST':
+        selected_seats = request.POST.getlist('seat')
+        request.session['selected_seats'] = selected_seats
+        return redirect('payment')
+
+    context = {
+        'movie': movie,
+        'seats': seats,
+    }
+    return render(request, 'choose_seat.html', context)

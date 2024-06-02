@@ -1,13 +1,15 @@
-FROM python:3.12.3
+FROM python:3.12.0
 
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1
 
-WORKDIR /app
+WORKDIR /code
 
-COPY . .
+COPY requirements.txt .
 
 RUN pip install -r requirements.txt
 
+COPY . . 
+
 EXPOSE 8000
 
-CMD [ "python", "manage.py", "runserver", "0.0.0.0:8000" ]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

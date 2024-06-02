@@ -40,18 +40,17 @@ urlpatterns = [
 ] 
 #+ static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
 """
-from os import stat
 from django.contrib import admin
 from django.urls import path, include
 from bioskop.views import movie_list, choose_seat
-from . import views
-
-
+from nih.custom_admin import custom_admin_site  # Impor custom admin site
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('auth/',include('authapp.urls')),
-    path('',include('bioskop.urls')),
+    path('custom-admin/', custom_admin_site.urls),  # Pastikan ini adalah 'custom-admin/'
+    path('auth/', include('authapp.urls')),
+    path('', include('bioskop.urls')),
     path('buy-ticket/', movie_list, name='movie-list'),
     path('choose-seat/<int:movie_id>/', choose_seat, name='choose-seat'),
-] 
+]
+
