@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Seat</title>
+    {% load static %}
+    <link href="{% static 'bioskop/css/style.css' %}" rel="stylesheet">
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* CSS styles remain unchanged */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Choose Your Seat</h1>
+        <h2>{{ movie.title }}</h2>
+        <h3>{{ movie.showtime }}</h3>
+
+        <!-- Representasi layar -->
+        <div class="screen">SCREEN</div>
+
+        <form id="seat-form" action="{% url 'payment' %}" method="post">
+            {% csrf_token %}
+            <div class="seats">
+                {% for seat in seats %}
+                    <label class="seat {% if seat.booked %}booked{% elif seat.id|stringformat:"s"|default_if_none:"0" in request.session.selected_seats %}selected{% endif %}">
+                        <input type="checkbox" name="seats" value="{{ seat.id }}" {% if seat.booked %}disabled{% endif %}>
+                        <i class="fas fa-chair"></i>
+                    </label>
+                {% endfor %}
+            </div>
+            <div class="total-price">
+                Total Price: Rp <span id="total-price">0</span>
+            </div>
+            {% if error_message %}
+                <div class="error">{{ error_message }}</div>
+            {% endif %}
+            <button type="submit">Proceed to Payment</button>
+        </form>
+    </div>
+
+    <script>
+        // JavaScript remains unchanged
+    </script>
+</body>
+</html>
