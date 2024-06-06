@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'authapp',
     'bioskop',
+    'myapp',
+    'myproject',
 ]
 
 MIDDLEWARE = [
